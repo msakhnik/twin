@@ -42,6 +42,7 @@ private:
     std::vector<cv::Rect>::iterator _r;
     cv::Rect _rect;
     int _tmp;
+    int _size;
 
 
     void _DetectFace();

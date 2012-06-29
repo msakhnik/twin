@@ -8,15 +8,17 @@
 #include "FaceDetector.h"
 #include <iterator>
 #include <algorithm>
+#include <ncurses.h>
 
 using namespace std;
 using namespace cv;
 
 cFaceDetector::cFaceDetector() :
-_cascadeName("../data/haarcascades/haarcascade_frontalface_alt.xml"),
-_nestedCascadeName("../data/haarcascades/haarcascade_frontalface_alt.xml"),
-_capture(0),
-_scale(1)
+    _cascadeName("../data/haarcascades/haarcascade_frontalface_alt.xml"),
+    _nestedCascadeName("../data/haarcascades/haarcascade_frontalface_alt.xml"),
+    _capture(0),
+    _scale(1),
+    _size(150)
 {
     _colors[1] = CV_RGB(0, 0, 255);
     _colors[2] = CV_RGB(0, 128, 255);
@@ -81,7 +83,7 @@ void cFaceDetector::_DetectFace()
                               //|CV_HAAR_DO_ROUGH_SEARCH
                               | CV_HAAR_SCALE_IMAGE
                               ,
-                              Size(30, 30));
+                              Size(_size, _size));
     t = (double) cvGetTickCount() - t;
     cerr << "detection time = " << (t / ((double) cvGetTickFrequency()*1000.)) << " ms" << endl;
 }
@@ -92,19 +94,20 @@ bool cFaceDetector::InFaceArrayRange()
 }
 
 vector<int> cFaceDetector::GetFaces()
-{
+{;
     cvNamedWindow("face", CV_WINDOW_AUTOSIZE);
     vector<int> a(5, 1);
     vector<Rect> nestedObjects;
     _nestedCascade.detectMultiScale(_smallImg(*_r), nestedObjects,
                                     1.1, 2, 0 | CV_HAAR_SCALE_IMAGE,
-                                    Size(30, 30));
+                                    Size(_size, _size));
     for (vector<Rect>::const_iterator nr = nestedObjects.begin(); nr != nestedObjects.end(); nr++)
     {
         _rect.x = cvRound((_r->x + nr->x) * _scale);
         _rect.y = cvRound((_r->y + nr->y) * _scale);
         _rect.width = cvRound((nr->width + nr->height) * 0.5 * _scale);
         _rect.height = cvRound((nr->width + nr->height)*0.5 * _scale);
+        cerr << _rect.width << ";" << _rect.height << endl;
         
 //        rectangle(_image, _rect, _colors[2]);
         _ConvertImage();
@@ -117,6 +120,7 @@ vector<int> cFaceDetector::GetFaces()
 
 void cFaceDetector::_ConvertImage()
 {
+    
     Mat image = _image(_rect);
     Mat image_gray;
     GaussianBlur( image, image, Size(3,3), 0, 0, BORDER_DEFAULT );
@@ -126,8 +130,8 @@ void cFaceDetector::_ConvertImage()
     Mat grad_x, grad_y;
     Mat abs_grad_x, abs_grad_y;
     int ddepth = CV_16S;
-    int scale = 1;
-    int delta = 0;
+    int scale = 2;
+    int delta = 1;
     //finding max gradient
     Sobel( image_gray, grad_x, ddepth, 1, 0, 3, scale, delta, BORDER_DEFAULT );
     Sobel( image_gray, grad_y, ddepth, 0, 1, 3, scale, delta, BORDER_DEFAULT );
@@ -138,9 +142,11 @@ void cFaceDetector::_ConvertImage()
 //    cvtColor( image, canny, CV_8UC1 );
     Canny(sobel, canny, 10, 100);
 //    subtract(canny, sobel, sobel);
-    cv::resize(sobel, _smallImgCopy, Size(150, 150), 1, 1);
-    adaptiveThreshold(_smallImgCopy, _smallImg, 255, CV_ADAPTIVE_THRESH_GAUSSIAN_C, CV_THRESH_BINARY, 3, 3);
-    imshow("face", _smallImg);
+    cv::resize(sobel, _smallImgCopy, Size(_size, _size), 1, 1);
+    adaptiveThreshold(_smallImgCopy, _smallImgCopy, 255, CV_ADAPTIVE_THRESH_GAUSSIAN_C, CV_THRESH_BINARY, 5, 3);
+//    _smallImg.release();
+//    _smallImgCopy.release();
+    imshow("face", _smallImgCopy);
 }
 
 
