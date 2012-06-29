@@ -22,27 +22,32 @@ class cFaceDetector
 {
 public:
     cFaceDetector();
-    cFaceDetector(const cFaceDetector& orig);
     bool Init();
     bool FindFace(const char * image);
+    bool InFaceArrayRange();
+    std::vector<int> GetFaces();
     virtual ~cFaceDetector();
 private:
     std::string _cascadeName;
     std::string _nestedCascadeName;
     CvCapture* _capture;
-    cv::Mat _frame; 
-    cv::Mat _frameCopy;
     cv::Mat _image;
     cv::Mat _gray;
     cv::Mat _smallImg;
+    cv::Mat _smallImgCopy;
     cv::CascadeClassifier _cascade;
     cv::CascadeClassifier _nestedCascade;
     double _scale;
     std::vector<cv::Rect> _faces;
+    std::vector<cv::Rect>::iterator _r;
+    cv::Rect _rect;
+    int _tmp;
 
 
     void _DetectFace();
     void _DrawFace();
+    void _ConvertImage();
+    void _FillDataArray();
 
     cv::Scalar _colors[8];
 };
