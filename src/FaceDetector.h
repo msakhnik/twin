@@ -43,6 +43,7 @@ private:
     cv::Rect _rect;
     int _tmp;
     int _size;
+    std::vector<int> _data;
 
 
     void _DetectFace();

@@ -94,9 +94,8 @@ bool cFaceDetector::InFaceArrayRange()
 }
 
 vector<int> cFaceDetector::GetFaces()
-{;
+{
     cvNamedWindow("face", CV_WINDOW_AUTOSIZE);
-    vector<int> a(5, 1);
     vector<Rect> nestedObjects;
     _nestedCascade.detectMultiScale(_smallImg(*_r), nestedObjects,
                                     1.1, 2, 0 | CV_HAAR_SCALE_IMAGE,
@@ -111,11 +110,11 @@ vector<int> cFaceDetector::GetFaces()
         
 //        rectangle(_image, _rect, _colors[2]);
         _ConvertImage();
-//        _FillDataArray();
+        _FillDataArray();
     }
     _r++;
     waitKey(0);
-    return a;
+    return _data;
 }
 
 void cFaceDetector::_ConvertImage()
@@ -149,13 +148,17 @@ void cFaceDetector::_ConvertImage()
     imshow("face", _smallImgCopy);
 }
 
-
 void cFaceDetector::_FillDataArray()
 {
-//    Mat image = _image(_rect);
-    for (int i = 0; i < _smallImg.rows; ++i)
-        for (int j = 0; j < _smallImg.cols; ++j)
-            cerr << _smallImg.at<int>(i, j) << endl;
+    _data.empty();
+    for (int i = 0; i < _smallImgCopy.rows; ++i)
+    {
+        for (int j = 0; j < _smallImgCopy.cols; ++j)
+            if (_smallImgCopy.at<bool>(i, j))
+               _data.push_back(1);
+            else
+                _data.push_back(0);
+    }
 }
 
 void cFaceDetector::_DrawFace()
