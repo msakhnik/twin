@@ -17,6 +17,4 @@ Makefile
 config.log
 config.status
 src/Makefile
-data/
-data/xor_data
-data/xor_float.net
+
