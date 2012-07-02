@@ -34,11 +34,11 @@
 using namespace std;
 
 cAnnTrain::cAnnTrain(unsigned int output, unsigned int size) :
-                                        _num_input(10000),
+                                        _num_input(size),
                                         _num_output(output),
                                         _count(0),
-                                        _train_file("../data/xor.data"),
-                                        _save_file("../data/xor_float.net")
+                                        _train_file("../data/fann/xor.data"),
+                                        _save_file("../data/fann/xor_float.net")
 {
     //    copy(_answer.begin(), _answer.end(), ostream_iterator<int>(cout, " "));
 }
@@ -216,4 +216,28 @@ int cAnnTrain::_GetMaxType(fann_type * data)
         }
     cerr << pos << endl;
     return pos;
+}
+
+float cAnnTrain::GetFloatAnswer(const vector<int> & data)
+{
+    fann_type *calc_out;
+    fann_type input[data.size()];
+
+    sAnn = fann_create_from_file(_save_file.c_str());
+    for (unsigned int i = 0; i < data.size(); ++i)
+    {
+        input[i] = data[i];
+    }
+
+    calc_out = fann_run(sAnn, input);
+    float max = calc_out[0];
+    for (unsigned int i = 0; i <  _num_output; ++i)
+    {
+        cerr << "====" << endl;
+        cerr << "calc_out[]="  << calc_out[i] << endl;
+        if (max < calc_out[i])
+            max = calc_out[i];
+    }
+    return max;
+
 }

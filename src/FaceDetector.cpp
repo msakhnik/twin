@@ -18,7 +18,7 @@ cFaceDetector::cFaceDetector() :
     _nestedCascadeName("../data/haarcascades/haarcascade_frontalface_alt.xml"),
     _capture(0),
     _scale(1),
-    _size(150)
+    _size(100)
 {
     _colors[1] = CV_RGB(0, 0, 255);
     _colors[2] = CV_RGB(0, 128, 255);
@@ -119,33 +119,42 @@ vector<int> cFaceDetector::GetFaces()
 
 void cFaceDetector::_ConvertImage()
 {
-    
     Mat image = _image(_rect);
+    cv::resize(image, image, Size(_size, _size), 1, 1);
     Mat image_gray;
-    GaussianBlur( image, image, Size(3,3), 0, 0, BORDER_DEFAULT );
     cvtColor( image, image_gray, CV_RGB2GRAY );
-    Mat sobel = image;
+    Mat sobel = image_gray;
     Sobel(image_gray, sobel, image_gray.depth(), 1, 0, 3, 1, 0, BORDER_DEFAULT);
-    Mat grad_x, grad_y;
-    Mat abs_grad_x, abs_grad_y;
-    int ddepth = CV_16S;
-    int scale = 2;
-    int delta = 1;
-    //finding max gradient
-    Sobel( image_gray, grad_x, ddepth, 1, 0, 3, scale, delta, BORDER_DEFAULT );
-    Sobel( image_gray, grad_y, ddepth, 0, 1, 3, scale, delta, BORDER_DEFAULT );
-    convertScaleAbs( grad_x, abs_grad_x );
-    convertScaleAbs( grad_y, abs_grad_y );
-    addWeighted( abs_grad_x, 0.5, abs_grad_y, 0.5, 0, sobel );
-    Mat canny(image.rows, image.cols, CV_8UC1);
-//    cvtColor( image, canny, CV_8UC1 );
-    Canny(sobel, canny, 10, 100);
-//    subtract(canny, sobel, sobel);
-    cv::resize(sobel, _smallImgCopy, Size(_size, _size), 1, 1);
-    adaptiveThreshold(_smallImgCopy, _smallImgCopy, 255, CV_ADAPTIVE_THRESH_GAUSSIAN_C, CV_THRESH_BINARY, 5, 3);
-//    _smallImg.release();
-//    _smallImgCopy.release();
+    adaptiveThreshold(sobel, _smallImgCopy, 255, CV_ADAPTIVE_THRESH_GAUSSIAN_C, CV_THRESH_BINARY, 7, 3);
+    Canny(_smallImgCopy, _smallImgCopy, 10, 100);
     imshow("face", _smallImgCopy);
+//    
+//    cv::resize(image, image, Size(_size, _size), 1, 1);
+//    Mat image_gray;
+//    GaussianBlur( image, image, Size(3,3), 0, 0, BORDER_DEFAULT );
+//    cvtColor( image, image_gray, CV_RGB2GRAY );
+//    Mat sobel = image;
+//    Sobel(image_gray, sobel, image_gray.depth(), 1, 0, 3, 1, 0, BORDER_DEFAULT);
+//    Mat grad_x, grad_y;
+//    Mat abs_grad_x, abs_grad_y;
+//    int ddepth = CV_16S;
+//    int scale = 2;
+//    int delta = 1;
+//    //finding max gradient
+//    Sobel( image_gray, grad_x, ddepth, 1, 0, 3, scale, delta, BORDER_DEFAULT );
+//    Sobel( image_gray, grad_y, ddepth, 0, 1, 3, scale, delta, BORDER_DEFAULT );
+//    convertScaleAbs( grad_x, abs_grad_x );
+//    convertScaleAbs( grad_y, abs_grad_y );
+//    addWeighted( abs_grad_x, 0.5, abs_grad_y, 0.5, 0, sobel );
+//    Mat canny(image.rows, image.cols, CV_8UC1);
+////    cvtColor( image, canny, CV_8UC1 );
+//    Canny(sobel, canny, 10, 100);
+////    subtract(canny, sobel, sobel);
+////    cv::resize(sobel, _smallImgCopy, Size(_size, _size), 1, 1);
+//    adaptiveThreshold(sobel, _smallImgCopy, 255, CV_ADAPTIVE_THRESH_GAUSSIAN_C, CV_THRESH_BINARY, 3, 7);
+////    _smallImg.release();
+////    _smallImgCopy.release();
+//    imshow("face", _smallImgCopy);
 }
 
 void cFaceDetector::_FillDataArray()

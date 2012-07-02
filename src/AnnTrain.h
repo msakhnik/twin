@@ -62,6 +62,7 @@ public:
 @return Positive number if successfully and -1 if wrong
 */
     int GetAnswer(const std::vector<int> & data);
+    float GetFloatAnswer(const std::vector<int> & data);
 /**
 @brief Save data in "../data/xor.data"
 @param data Array with data
