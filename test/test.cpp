@@ -24,7 +24,7 @@ TEST(cAnnTrain, Init)
 
 TEST(cFaceDetector, FindFace)
 {
-    ASSERT_TRUE(face.FindFace("../data/test_img/t1.jpg"));
+    ASSERT_TRUE(face.FindFace("../data/test_img/2.jpg"));
 }
 
 TEST(cFaceDetector, InFaceArrayRange)
@@ -50,10 +50,10 @@ TEST(cAnnTrain, SaveData)
 }
 */
 
-
-TEST (cAnnTrain, GetFloatAnswer)
-{
-    int sum =  accumulate(temp_vector.begin(), temp_vector.end(), 0);
-    printf("%f/n", ann.GetFloatAnswer(temp_vector));
-    cerr << endl << "sum is:" << sum << endl;
-}
+//
+//TEST (cAnnTrain, GetFloatAnswer)
+//{
+//    int sum =  accumulate(temp_vector.begin(), temp_vector.end(), 0);
+//    printf("%f/n", ann.GetFloatAnswer(temp_vector));
+//    cerr << endl << "sum is:" << sum << endl;
+//}

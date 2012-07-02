@@ -15,7 +15,7 @@ using namespace cv;
 
 cFaceDetector::cFaceDetector() :
     _cascadeName("../data/haarcascades/haarcascade_frontalface_alt.xml"),
-    _nestedCascadeName("../data/haarcascades/haarcascade_frontalface_alt.xml"),
+    _nestedCascadeName("../data/haarcascades/haarcascade_frontalface_alt_tree.xml"),
     _capture(0),
     _scale(1),
     _size(100)
@@ -127,7 +127,7 @@ void cFaceDetector::_ConvertImage()
     Sobel(image_gray, sobel, image_gray.depth(), 1, 0, 3, 1, 0, BORDER_DEFAULT);
     adaptiveThreshold(sobel, _smallImgCopy, 255, CV_ADAPTIVE_THRESH_GAUSSIAN_C, CV_THRESH_BINARY, 7, 3);
     Canny(_smallImgCopy, _smallImgCopy, 10, 100);
-    imshow("face", _smallImgCopy);
+    imshow("face", image);
 //    
 //    cv::resize(image, image, Size(_size, _size), 1, 1);
 //    Mat image_gray;
