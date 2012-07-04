@@ -42,4 +42,6 @@ PKG_CHECK_MODULES(OPENCV, [
   ])
 ])
 
+PKG_CHECK_MODULES([GTKMM], [gtkmm-3.0])
+
 AC_OUTPUT([Makefile src/Makefile test/Makefile])

@@ -6,6 +6,11 @@
  */
 
 #include <cstdlib>
+#include "AnnTrain.h"
+#include "Form.h"
+#include "FaceDetector.h"
+
+#include <gtkmm/main.h>
 
 using namespace std;
 
@@ -14,6 +19,10 @@ using namespace std;
  */
 int main(int argc, char** argv)
 {
+    Gtk::Main kit(argc, argv);
+
+    cForm form;
+    Gtk::Main::run(form);
 
     return 0;
 }
