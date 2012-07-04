@@ -26,19 +26,19 @@ m_button("Hello World")
     set_title("Gtk::FileSelection example");
 
     add(m_MainBox);
+//    m_MainBox.pack_start(m_fixed);
+//    m_ButtonBox.property_expand() = true;
     m_MainBox.pack_start(m_ButtonBox);
+    
     m_MainBox.pack_start(m_ImageBox);
+//    m_ButtonBox.set_size_request(70, 100);
     //    m_ButtonBox.pack_start(m_image);
-    m_ButtonBox.set_border_width(10);
 
-    m_ButtonBox.pack_start(m_Button_File);
+    m_ButtonBox.pack_start(m_Button_File, true, false, 0);
+    m_ImageBox.set_size_request(300, 300);
     m_ImageBox.pack_start(m_image, true, true);
     m_Button_File.signal_clicked().connect(sigc::mem_fun(*this,
                                                          &cForm::on_button_file_clicked));
-    m_Button_File.set_border_width(5);
-    m_Button_Folder.set_border_width(5);
-    m_button.set_border_width(5);
-
 
     m_ButtonBox.pack_start(m_Button_Folder);
     m_ButtonBox.pack_start(m_button);
@@ -46,18 +46,7 @@ m_button("Hello World")
                                                            &cForm::on_button_folder_clicked));
 
     show_all_children();
-
-    //    set_border_width(10);
-    //    m_button.set_border_width(20);
-
-    //Когда кнопка получает сигнал "clicked"(нажата, прим.пер.), она вызывает метод on_button_clicked(), описанный ниже.
     m_button.signal_clicked().connect(sigc::mem_fun(*this, &cForm::on_button_clicked));
-
-    //Эта строка поместит кнопку в Window (контейнер).
-    //    add(m_button);
-
-    //И последний шаг - отобразить только что созданный виджет..
-    //    m_button.show();
 }
 
 cForm::~cForm()

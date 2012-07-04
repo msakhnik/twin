@@ -30,6 +30,7 @@ private:
     Gtk::Box m_ImageBox;
     Gtk::ButtonBox m_MainBox;
     Gtk::Button m_Button_File, m_Button_Folder;
+    Gtk::Fixed m_fixed;
 
     //Виджет объекта:
     Gtk::Button m_button;
