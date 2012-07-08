@@ -16,24 +16,34 @@ public:
     virtual ~cForm();
 private:
     //Обработчик сигналов:
-    virtual void on_button_clicked();
-    void on_button_file_clicked();
-    void on_button_folder_clicked();
-    void show_img();
+    virtual void _OnButtonClicked();
+    void _OnButtonFileClicked();
+    void _OnButtonFolderClicked();
+    void _ShowImg();
+    void _BuildButtonBox();
+    void _BuildImageBoxes();
 
     //Child widgets:
     //    virtual bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr);
 
-    Gtk::Image m_image;
+    Gtk::Image _m_image;
+    Gtk::Image _m_face;
     //    bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr);
-    Gtk::Box m_ButtonBox;
-    Gtk::Box m_ImageBox;
-    Gtk::ButtonBox m_MainBox;
-    Gtk::Button m_Button_File, m_Button_Folder;
-    Gtk::Fixed m_fixed;
+    Gtk::Box _m_ButtonBox;
+    Gtk::Box _m_ButtonBoxWrap;
+    Gtk::Box _m_ImageOriginalBoxWrap;
+    Gtk::Box _m_ImageFaceBoxWrap;
+    Gtk::ButtonBox _m_MainBox;
+    Gtk::Button _m_Button_File, _m_Button_Folder;
+    Gtk::Fixed _m_fixed;
+    Gtk::Label _m_original_image_label;
+    Gtk::Label _m_face_image_label;
+    Gtk::Box _m_ImageOriginalLabelBox;
+    Gtk::Box _m_ImageFaceLabelBox;
 
     //Виджет объекта:
-    Gtk::Button m_button;
+    Gtk::Button _m_button;
+    Gtk::Button _m_find_face;
     std::string _filename;
 };
 
