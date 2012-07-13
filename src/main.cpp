@@ -21,9 +21,21 @@ int main(int argc, char** argv)
 {
     Gtk::Main kit(argc, argv);
     cFaceDetector face;
-    
     cForm form(face);
-    Gtk::Main::run(form);
+    if (!face.Init())
+    {
+        Gtk::MessageDialog dialog(form, "Init error",
+                                  false /* use_markup */, Gtk::MESSAGE_ERROR,
+                                  Gtk::BUTTONS_OK);
+        dialog.set_secondary_text(
+                                  "Cannot init cFaceDetector class.");
+
+        dialog.run();
+    }
+    else
+    {
+        Gtk::Main::run(form);
+    }
     return 0;
 }
 

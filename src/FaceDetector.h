@@ -23,6 +23,7 @@ public:
     bool InFaceArrayRange();
     std::vector<int> GetFaces();
     virtual ~cFaceDetector();
+    cv::Mat& GetImage();
 private:
     std::string _cascadeName;
     std::string _nestedCascadeName;
@@ -31,6 +32,7 @@ private:
     cv::Mat _gray;
     cv::Mat _smallImg;
     cv::Mat _smallImgCopy;
+    cv::Mat _retImage;
     cv::CascadeClassifier _cascade;
     cv::CascadeClassifier _nestedCascade;
     double _scale;
@@ -46,7 +48,6 @@ private:
     void _DrawFace();
     void _ConvertImage();
     void _FillDataArray();
-
     cv::Scalar _colors[8];
 };
 
