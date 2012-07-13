@@ -1,42 +1,35 @@
-/* 
- * File:   Form.cpp
- * Author: morwin
- * 
- * Created on 4 липня 2012, 10:02
- */
-
 #include "Form.h"
 #include <iostream>
-#include <gtkmm-3.0/gtkmm/container.h>
-#include <glibmm-2.4/glibmm/refptr.h>
+#include <gtkmm-2.4/gtkmm.h>
+#include <gtkmm-3.0/gtkmm/enums.h>
 
-using namespace std;
-
-cForm::cForm() :
-_m_image("Big picture"),
-_m_ButtonBox(Gtk::ORIENTATION_VERTICAL),
-_m_ImageOriginalBoxWrap(Gtk::ORIENTATION_VERTICAL),
-_m_ImageFaceBoxWrap(Gtk::ORIENTATION_VERTICAL),
-_m_MainBox(Gtk::ORIENTATION_HORIZONTAL),
-_m_Button_File("Load Image"),
-_m_Button_Folder("Choose Folder"),
-_m_original_image_label("Original image"),
-_m_face_image_label("Face"),
-_m_button("Hello World"),
-_m_find_face("Find Face")
-// Создает новую кнопку с надписью "Hello World". 
+cForm::cForm(cFaceDetector & face) :
+//    m_button("Hello World"), // creates a new button with label "Hello World".
+m_button_file("Choose Photo"),
+m_button_folder("Choose Folder"),
+m_button_find_face("Find Face"),
+m_frame_vertical_center("Original Image"),
+m_frame_vertical_left("Controls"),
+m_frame_vertical_right("Face")
 {
-    //Устанавливает рамку окна
-    set_title("Face detection");
+    set_title("Face detector");
+    add(m_main_box);
+    m_main_box.set_size_request(650, 350);
+    m_main_box.add(m_left_box);
+    m_main_box.add(m_center_box);
+    m_main_box.add(m_right_box);
 
-    add(_m_MainBox);
-    _m_MainBox.set_size_request(500, 50);
-    _m_MainBox.pack_start(_m_ButtonBoxWrap, true, false, 0);
-    _m_MainBox.pack_start(_m_ImageOriginalBoxWrap,  true, false, 0);
-    _m_MainBox.pack_start(_m_ImageFaceBoxWrap,  true, false, 0);
-    _m_MainBox.pack_start(_m_ImageFaceBoxWrap,  true, false, 0);
-    _BuildButtonBox();
-    _BuildImageBoxes();
+    _BuildLeftBox();
+    _BuildCenterBox();
+    _BuildRightBox();
+
+    m_button_folder.set_sensitive(false);
+
+    m_button_file.signal_clicked().connect(sigc::mem_fun(*this,
+                                                         &cForm::on_button_file_clicked));
+    m_button_folder.signal_clicked().connect(sigc::mem_fun(*this,
+                                                           &cForm::on_button_folder_clicked));
+
     show_all_children();
 }
 
@@ -44,12 +37,12 @@ cForm::~cForm()
 {
 }
 
-void cForm::_OnButtonClicked()
+void cForm::on_button_clicked()
 {
     std::cout << "Hello World" << std::endl;
 }
 
-void cForm::_OnButtonFolderClicked()
+void cForm::on_button_folder_clicked()
 {
     Gtk::FileChooserDialog dialog("Please choose a folder",
                                   Gtk::FILE_CHOOSER_ACTION_SELECT_FOLDER);
@@ -84,7 +77,7 @@ void cForm::_OnButtonFolderClicked()
     }
 }
 
-void cForm::_OnButtonFileClicked()
+void cForm::on_button_file_clicked()
 {
     Gtk::FileChooserDialog dialog("Please choose a file",
                                   Gtk::FILE_CHOOSER_ACTION_OPEN);
@@ -94,30 +87,11 @@ void cForm::_OnButtonFileClicked()
     dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
     dialog.add_button(Gtk::Stock::OPEN, Gtk::RESPONSE_OK);
 
-    //Add filters, so that only certain file types can be selected:
-    /*
-      Glib::RefPtr<Gtk::FileFilter> filter_text = Gtk::FileFilter::create();
-      filter_text->set_name("Text files");
-      filter_text->add_mime_type("text/plain");
-      dialog.add_filter(filter_text);
-
-      Glib::RefPtr<Gtk::FileFilter> filter_cpp = Gtk::FileFilter::create();
-      filter_cpp->set_name("C/C++ files");
-      filter_cpp->add_mime_type("text/x-c");
-      filter_cpp->add_mime_type("text/x-c++");
-      filter_cpp->add_mime_type("text/x-c-header");
-        dialog.add_filter(filter_cpp);
-     */
-    Glib::RefPtr<Gtk::FileFilter> filter_image = Gtk::FileFilter::create();
-    filter_image->set_name("Images");
-    filter_image->add_mime_type("image/jpg");
-    filter_image->add_pattern("*.jpg");
+    Gtk::FileFilter filter_image;
+    filter_image.set_name("Images");
+    filter_image.add_mime_type("image/jpg");
+    filter_image.add_pattern("*.jpg");
     dialog.add_filter(filter_image);
-
-    //  Glib::RefPtr<Gtk::FileFilter> filter_any = Gtk::FileFilter::create();
-    //  filter_any->set_name("Any files");
-    //  filter_any->add_pattern("*");
-    //  dialog.add_filter(filter_any);
 
     //Show the dialog and wait for a user response:
     int result = dialog.run();
@@ -133,7 +107,7 @@ void cForm::_OnButtonFileClicked()
         std::string filename = dialog.get_filename();
         std::cout << "File selected: " << filename << std::endl;
         _filename = filename;
-         _ShowImg();
+        _ShowOriginalImg();
         break;
     }
     case(Gtk::RESPONSE_CANCEL):
@@ -149,74 +123,44 @@ void cForm::_OnButtonFileClicked()
     }
 }
 
-void cForm:: _ShowImg()
+void cForm::_BuildLeftBox()
+{
+    m_left_box.pack_start(m_hbox_wrap_left, Gtk::PACK_SHRINK, 10);
+    m_hbox_wrap_left.pack_start(m_frame_vertical_left, Gtk::PACK_SHRINK, 10);
+
+    m_frame_vertical_left.set_size_request(140, 150);
+    m_frame_vertical_left.set_tooltip_text("Controls");
+    m_hbox_button_left.set_border_width(10);
+    m_frame_vertical_left.add(m_hbox_button_left);
+    m_button_box.add(m_button_file);
+    m_button_box.add(m_button_find_face);
+    m_button_box.add(m_button_folder);
+    m_hbox_button_left.pack_start(m_button_box,
+                                  Gtk::PACK_EXPAND_WIDGET, 5);
+}
+
+void cForm::_BuildCenterBox()
+{
+    m_center_box.pack_start(m_hbox_wrap_center, Gtk::PACK_SHRINK, 10);
+    m_hbox_wrap_center.pack_start(m_frame_vertical_center, Gtk::PACK_SHRINK, 10);
+
+    m_frame_vertical_center.set_size_request(300, 300);
+    m_frame_vertical_center.add(m_image);
+}
+
+void cForm::_BuildRightBox()
+{
+    m_right_box.pack_start(m_hbox_wrap_right, Gtk::PACK_SHRINK, 10);
+    m_hbox_wrap_right.pack_start(m_frame_vertical_right, Gtk::PACK_SHRINK, 10);
+
+    m_frame_vertical_right.set_size_request(150, 150);
+//    m_frame_vertical_right.add(m_image);
+}
+
+void cForm::_ShowOriginalImg()
 {
     Glib::RefPtr<Gdk::Pixbuf> pixbuf;
     pixbuf = Gdk::Pixbuf::create_from_file(_filename, 300, 300);
-    _m_image.set(pixbuf);
-    _m_image.show();
-}
-
-void cForm::_BuildButtonBox()
-{
-    _m_ButtonBoxWrap.set_size_request(110, 300);
-    _m_ButtonBoxWrap.pack_start(_m_ButtonBox);
-    _m_ButtonBox.set_border_width(10);
-    _m_ButtonBox.set_size_request(110, 100);
-    _m_ButtonBox.set_halign(Gtk::ALIGN_START);
-    _m_ButtonBox.set_valign(Gtk::ALIGN_START);
-    
-    _m_Button_File.set_size_request(110, 20);
-    _m_Button_File.set_border_width(0);
-    _m_Button_File.set_halign(Gtk::ALIGN_START);
-    _m_Button_File.set_valign(Gtk::ALIGN_START);
-    _m_Button_File.signal_clicked().connect(sigc::mem_fun(*this,
-                                                         &cForm::_OnButtonFileClicked));
-    _m_ButtonBox.pack_start(_m_Button_File);
-
-    _m_find_face.set_size_request(110, 20);
-    _m_find_face.set_border_width(0);
-    _m_find_face.set_halign(Gtk::ALIGN_START);
-    _m_find_face.set_valign(Gtk::ALIGN_START);
-    _m_find_face.signal_clicked().connect(sigc::mem_fun(*this, &cForm::_OnButtonClicked));
-    _m_ButtonBox.pack_start(_m_find_face);
-
-    _m_Button_Folder.set_size_request(110, 20);
-    _m_Button_Folder.set_border_width(0);
-    _m_Button_Folder.set_halign(Gtk::ALIGN_START);
-    _m_Button_Folder.set_valign(Gtk::ALIGN_START);
-    _m_Button_Folder.signal_clicked().connect(sigc::mem_fun(*this,
-                                                           &cForm::_OnButtonFolderClicked));
-    _m_Button_Folder.set_sensitive(false);
-    _m_ButtonBox.pack_start(_m_Button_Folder);
-    
-    _m_button.set_size_request(110, 20);
-    _m_button.set_border_width(0);
-    _m_button.set_halign(Gtk::ALIGN_START);
-    _m_button.set_valign(Gtk::ALIGN_START);
-    _m_button.signal_clicked().connect(sigc::mem_fun(*this, &cForm::_OnButtonClicked));
-    _m_ButtonBox.pack_start(_m_button);
-
-}
-
-void cForm::_BuildImageBoxes()
-{
-    _m_ImageOriginalBoxWrap.set_size_request(300, 300);
-    _m_ImageOriginalBoxWrap.pack_start(_m_ImageOriginalLabelBox);
-
-    _m_ImageOriginalLabelBox.set_border_width(10);
-    _m_ImageOriginalLabelBox.set_size_request(300, 20);
-    _m_ImageOriginalLabelBox.set_halign(Gtk::ALIGN_START);
-    _m_ImageOriginalLabelBox.set_valign(Gtk::ALIGN_START);
-    _m_ImageOriginalLabelBox.pack_start(_m_original_image_label);
-    _m_ImageOriginalBoxWrap.pack_start(_m_image, true, false, 0);
-
-    _m_ImageFaceBoxWrap.pack_start(_m_ImageFaceLabelBox);
-
-    _m_ImageFaceLabelBox.set_border_width(10);
-//    _m_ImageFaceLabelBox.set_size_request(300, 20);
-    _m_ImageFaceLabelBox.set_halign(Gtk::ALIGN_CENTER);
-    _m_ImageFaceLabelBox.set_valign(Gtk::ALIGN_START);
-    _m_ImageFaceLabelBox.pack_start(_m_face_image_label);
-    _m_ImageFaceBoxWrap.pack_start(_m_image, true, false, 0);
+    m_image.set(pixbuf);
+    m_image.show();
 }

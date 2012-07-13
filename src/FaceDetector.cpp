@@ -1,9 +1,3 @@
-/* 
- * File:   FaceDetector.cpp
- * Author: morwin
- * 
- * Created on 23 червня 2012, 0:12
- */
 
 #include "FaceDetector.h"
 #include <iterator>
@@ -28,6 +22,7 @@ cFaceDetector::cFaceDetector() :
     _colors[6] = CV_RGB(255, 255, 0);
     _colors[7] = CV_RGB(255, 0, 0);
     _colors[8] = CV_RGB(255, 0, 255);
+
 }
 
 bool cFaceDetector::Init()

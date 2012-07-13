@@ -1,9 +1,3 @@
-/* 
- * File:   FaceDetector.h
- * Author: morwin
- *
- * Created on 23 червня 2012, 0:12
- */
 
 #pragma once
 
@@ -17,6 +11,8 @@
 #include <stdio.h>
 #include <vector>
 #include <string.h>
+
+using namespace cv;
 
 class cFaceDetector
 {

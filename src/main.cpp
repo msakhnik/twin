@@ -10,7 +10,7 @@
 #include "Form.h"
 #include "FaceDetector.h"
 
-#include <gtkmm/main.h>
+//s#include <gtkmm/main.h>
 
 using namespace std;
 
@@ -20,10 +20,10 @@ using namespace std;
 int main(int argc, char** argv)
 {
     Gtk::Main kit(argc, argv);
-
-    cForm form;
+    cFaceDetector face;
+    
+    cForm form(face);
     Gtk::Main::run(form);
-
     return 0;
 }
 

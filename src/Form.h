@@ -1,50 +1,39 @@
-/* 
- * File:   Form.h
- * Author: morwin
- *
- * Created on 4 липня 2012, 10:02
- */
+#include <gtkmm-2.4/gtkmm.h>
+#include <string.h>
+#include <FaceDetector.h>
 
-#pragma once
-#include <gtkmm-3.0/gtkmm.h>
-#include<gdkmm-3.0/gdkmm.h>
+class cFaceDetector;
 
 class cForm : public Gtk::Window
 {
 public:
-    cForm();
+    cForm(cFaceDetector &);
     virtual ~cForm();
+
+protected:
+    void on_button_file_clicked();
+    void on_button_folder_clicked();
+    void on_button_clicked();
+    Gtk::VButtonBox m_button_box;
+    Gtk::Button m_button_file, m_button_folder, m_button_find_face;
+
+    Gtk::VBox m_left_box, m_center_box, m_right_box;
+
+    Gtk::HBox m_main_box, m_hbox_button_left, m_hbox_wrap_left;
+
+    Gtk::HBox m_hbox_button_center, m_hbox_wrap_center;
+    Gtk::Frame m_frame_vertical_center;
+
+    Gtk::HBox m_hbox_button_right, m_hbox_wrap_right;
+    Gtk::Frame m_frame_vertical_left, m_frame_vertical_right;
+
+    Gtk::Image m_image, m_face;
 private:
-    //Обработчик сигналов:
-    virtual void _OnButtonClicked();
-    void _OnButtonFileClicked();
-    void _OnButtonFolderClicked();
-    void _ShowImg();
-    void _BuildButtonBox();
-    void _BuildImageBoxes();
-
-    //Child widgets:
-    //    virtual bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr);
-
-    Gtk::Image _m_image;
-    Gtk::Image _m_face;
-    //    bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr);
-    Gtk::Box _m_ButtonBox;
-    Gtk::Box _m_ButtonBoxWrap;
-    Gtk::Box _m_ImageOriginalBoxWrap;
-    Gtk::Box _m_ImageFaceBoxWrap;
-    Gtk::ButtonBox _m_MainBox;
-    Gtk::Button _m_Button_File, _m_Button_Folder;
-    Gtk::Fixed _m_fixed;
-    Gtk::Label _m_original_image_label;
-    Gtk::Label _m_face_image_label;
-    Gtk::Box _m_ImageOriginalLabelBox;
-    Gtk::Box _m_ImageFaceLabelBox;
-
-    //Виджет объекта:
-    Gtk::Button _m_button;
-    Gtk::Button _m_find_face;
     std::string _filename;
+    cFaceDetector* _face;
+    void _BuildLeftBox();
+    void _BuildCenterBox();
+    void _BuildRightBox();
+    void _ShowOriginalImg();
+    void _Init();
 };
-
-
