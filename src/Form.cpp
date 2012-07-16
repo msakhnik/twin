@@ -142,17 +142,6 @@ void cForm::on_button_find_face_clicked()
         vector<int> temp_vector;
         temp_vector = _face.GetFaces();
 
-        Glib::RefPtr<Gdk::Pixbuf> pixbuf = Gdk::Pixbuf::create_from_data(
-                (guint8*)_face.GetImage().data,
-                Gdk::COLORSPACE_RGB,
-                false,
-                8,
-                150,
-                150,
-                _face.GetImage().step
-                );
-
-        m_face.set(pixbuf);
     }
     else
         Gtk::MessageDialog dialog(*this, "Image not found",

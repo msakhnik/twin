@@ -51,8 +51,8 @@ bool cFaceDetector::FindFace(const char * image)
     _DetectFace();
     //    _DrawFace();
     _r = _faces.begin();
-    cvNamedWindow("result", 1);
-    imshow("result", _image);
+//    cvNamedWindow("result", 1);
+//    imshow("result", _image);
     waitKey(0);
 
     return true;
@@ -116,14 +116,17 @@ vector<int> cFaceDetector::GetFaces()
 void cFaceDetector::_ConvertImage()
 {
     Mat image = _image(_rect);
-    cv::resize(image, image, Size(_size, _size), 1, 1);
+//    cv::resize(image, image, Size(_size, _size), 1, 1);
     Mat image_gray;
     cvtColor( image, image_gray, CV_RGB2GRAY );
     Mat sobel = image_gray;
     Sobel(image_gray, sobel, image_gray.depth(), 1, 0, 3, 1, 0, BORDER_DEFAULT);
-    adaptiveThreshold(sobel, _smallImgCopy, 255, CV_ADAPTIVE_THRESH_GAUSSIAN_C, CV_THRESH_BINARY, 7, 3);
+//    Sobel(sobel, sobel, sobel.depth(), 1, 0, 3, 1, 0, BORDER_DEFAULT);
+//    adaptiveThreshold(sobel, _smallImgCopy, 255, CV_ADAPTIVE_THRESH_MEAN_C, CV_THRESH_BINARY, 25, 0);
+//    threshold(sobel, _smallImgCopy, 128, 255, CV_ADAPTIVE_THRESH_MEAN_C);
+//    adaptiveThreshold(sobel, _smallImgCopy, 8)
 //    Canny(_smallImgCopy, _smallImgCopy, 10, 100);
-    imshow("face", _smallImgCopy);
+    imshow("face", sobel);
 //    
 //    cv::resize(image, image, Size(_size, _size), 1, 1);
 //    Mat image_gray;
