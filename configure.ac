@@ -8,7 +8,7 @@ AC_PROG_CXX
 
 AC_PROG_CPP
 
-OPENCV_REQUIRED=2.3.0
+OPENCV_REQUIRED=2.4.2
 
 AC_ARG_ENABLE(unittests,
    [  --enable-unittests      build unittests],
@@ -44,4 +44,4 @@ PKG_CHECK_MODULES(OPENCV, [
 
 PKG_CHECK_MODULES([GTKMM], [gtkmm-2.4])
 
-AC_OUTPUT([Makefile src/Makefile])
+AC_OUTPUT([Makefile src/Makefile test/Makefile])
