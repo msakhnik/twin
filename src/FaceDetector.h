@@ -21,7 +21,7 @@ public:
     bool Init();
     bool FindFace(const char * image);
     bool InFaceArrayRange();
-    std::vector<int> GetFaces();
+    cv::Mat& GetFaces();
     virtual ~cFaceDetector();
     cv::Mat& GetImage();
 private:

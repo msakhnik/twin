@@ -7,20 +7,20 @@
 using namespace std;
 
 cForm::cForm(cFaceDetector & face) :
-//    m_button("Hello World"), // creates a new button with label "Hello World".
-m_button_file("Choose Photo"),
-m_button_folder("Choose Folder"),
-m_button_find_face("Find Face"),
+m_button_file("Load Image"),
+m_button_add_to_train("Add To Train"),
+m_button_train("Train"),
+m_button_folder("Force Folder"),
 m_frame_vertical_center("Original Image"),
 m_frame_vertical_left("Controls"),
-m_frame_vertical_right("Face"),
+m_frame_vertical_right("Image in train"),
 _filename(""),
 _face(face)
 {
     set_title("Face detector");
-    
+
     add(m_main_box);
-    m_main_box.set_size_request(650, 350);
+    m_main_box.set_size_request(750, 350);
     m_main_box.add(m_left_box);
     m_main_box.add(m_center_box);
     m_main_box.add(m_right_box);
@@ -29,15 +29,21 @@ _face(face)
     _BuildCenterBox();
     _BuildRightBox();
 
-    m_button_folder.set_sensitive(false);
-    m_button_find_face.set_sensitive(false);
-
     m_button_file.signal_clicked().connect(sigc::mem_fun(*this,
                                                          &cForm::on_button_file_clicked));
-    m_button_folder.signal_clicked().connect(sigc::mem_fun(*this,
-                                                           &cForm::on_button_folder_clicked));
-    m_button_find_face.signal_clicked().connect(sigc::mem_fun(*this,
-                                                           &cForm::on_button_find_face_clicked));
+
+    m_button_add_to_train.signal_clicked().connect(sigc::mem_fun(*this,
+                                                         &cForm::on_button_add_to_train_clicked));
+
+    m_button_train.signal_clicked().connect(sigc::mem_fun(*this,
+                                                         &cForm::on_button_train_clicked));
+
+    //    m_button_folder.signal_clicked().connect(sigc::mem_fun(*this,
+    //                                                           &cForm::on_button_folder_clicked));
+    //    m_button_find_face.signal_clicked().connect(sigc::mem_fun(*this,
+    //                                                              &cForm::on_button_find_face_clicked));
+    //    m_button_getanswer.signal_clicked().connect(sigc::mem_fun(*this,
+    //                                                              &cForm::on_button_getanswer_clicked));
 
     show_all_children();
 }
@@ -46,9 +52,35 @@ cForm::~cForm()
 {
 }
 
-void cForm::on_button_clicked()
+void cForm::on_button_add_to_train_clicked()
 {
-    std::cout << "Hello World" << std::endl;
+    static int i = 0;
+    string line;
+    line = "Hello";
+    _AddRow(line, i);
+    ++i;
+}
+
+void cForm::on_button_train_clicked()
+{
+    try {
+        //Some actions
+        //
+        Gtk::MessageDialog dialog(*this, "Train Saccesfully",
+                                  false /* use_markup */, Gtk::MESSAGE_INFO,
+                                  Gtk::BUTTONS_OK);
+        dialog.run();
+    }
+    catch (cv::Exception& e)
+    {
+        cout << endl << e.what() <<endl;
+        Gtk::MessageDialog dialog(*this, "Train Failed",
+                                  false /* use_markup */, Gtk::MESSAGE_ERROR,
+                                  Gtk::BUTTONS_OK);
+        dialog.set_secondary_text(
+                                  e.what());
+        dialog.run();
+    }
 }
 
 void cForm::on_button_folder_clicked()
@@ -91,7 +123,7 @@ void cForm::on_button_file_clicked()
     Gtk::FileChooserDialog dialog("Please choose a file",
                                   Gtk::FILE_CHOOSER_ACTION_OPEN);
     dialog.set_transient_for(*this);
-    dialog.set_current_folder("../data/test_img");
+    dialog.set_current_folder("../data");
 
     //Add response buttons the the dialog:
     dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
@@ -103,10 +135,8 @@ void cForm::on_button_file_clicked()
     filter_image.add_pattern("*.jpg");
     dialog.add_filter(filter_image);
 
-    //Show the dialog and wait for a user response:
     int result = dialog.run();
 
-    //Handle the response:
     switch (result)
     {
     case(Gtk::RESPONSE_OK):
@@ -118,7 +148,6 @@ void cForm::on_button_file_clicked()
         std::cout << "File selected: " << filename << std::endl;
         _filename = filename;
         _ShowOriginalImg();
-        m_button_find_face.set_sensitive(true);
         break;
     }
     case(Gtk::RESPONSE_CANCEL):
@@ -134,32 +163,18 @@ void cForm::on_button_file_clicked()
     }
 }
 
-void cForm::on_button_find_face_clicked()
-{
-    if (_filename.size())
-    {
-        _face.FindFace(_filename.c_str());
-        vector<int> temp_vector;
-        temp_vector = _face.GetFaces();
-
-    }
-    else
-        Gtk::MessageDialog dialog(*this, "Image not found",
-                                  false /* use_markup */, Gtk::MESSAGE_ERROR,
-                                  Gtk::BUTTONS_OK);
-}
-
 void cForm::_BuildLeftBox()
 {
     m_left_box.pack_start(m_hbox_wrap_left, Gtk::PACK_SHRINK, 10);
     m_hbox_wrap_left.pack_start(m_frame_vertical_left, Gtk::PACK_SHRINK, 10);
 
-    m_frame_vertical_left.set_size_request(140, 150);
+    m_frame_vertical_left.set_size_request(160, 250);
     m_frame_vertical_left.set_tooltip_text("Controls");
     m_hbox_button_left.set_border_width(10);
     m_frame_vertical_left.add(m_hbox_button_left);
     m_button_box.add(m_button_file);
-    m_button_box.add(m_button_find_face);
+    m_button_box.add(m_button_add_to_train);
+    m_button_box.add(m_button_train);
     m_button_box.add(m_button_folder);
     m_hbox_button_left.pack_start(m_button_box,
                                   Gtk::PACK_EXPAND_WIDGET, 5);
@@ -179,9 +194,19 @@ void cForm::_BuildRightBox()
     m_right_box.pack_start(m_hbox_wrap_right, Gtk::PACK_SHRINK, 10);
     m_hbox_wrap_right.pack_start(m_frame_vertical_right, Gtk::PACK_SHRINK, 10);
 
-    m_frame_vertical_right.set_size_request(150, 150);
-    m_frame_vertical_right.add(m_face);
-    //    m_frame_vertical_right.add(m_image);
+    m_frame_vertical_right.set_size_request(150, 120);
+    m_frame_vertical_right.add(m_VPaned);
+    m_VPaned.add(m_ScrolledWindow);
+
+    m_refListStore = Gtk::ListStore::create(m_Columns);
+
+    m_ScrolledWindow.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
+    m_ScrolledWindow.add(m_TreeView);
+    m_TreeView.set_model(m_refListStore);
+    m_TreeView.append_column("№", m_Columns.m_col_num);
+    m_TreeView.append_column("Image", m_Columns.m_col_text);
+
+    show_all_children();
 }
 
 void cForm::_ShowOriginalImg()
@@ -192,3 +217,13 @@ void cForm::_ShowOriginalImg()
     m_image.show();
 }
 
+void cForm::_AddRow(string& str, int num)
+{
+    string number;
+    std::stringstream ss;
+    ss << num;
+    ss >> number;
+    m_row = *(m_refListStore->append());
+    m_row[m_Columns.m_col_num] = number;
+    m_row[m_Columns.m_col_text] = str;
+}

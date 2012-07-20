@@ -30,9 +30,10 @@ bool cFaceRecognizer::RemoveLastTrainImage()
     return true;
 }
 
-bool cFaceRecognizer::AddTrainImage(string fn, int label)
+bool cFaceRecognizer::AddTrainImage(Mat& img, int label)
 {
-    _images.push_back(imread(fn.c_str(), 0));
+    cerr << "Add image < " << endl;
+    _images.push_back(img);
     if (_images.at(_images.size() - 1).empty())
     {
         cerr << "Image not found" << endl;

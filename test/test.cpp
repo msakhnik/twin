@@ -38,7 +38,7 @@ TEST(cFaceDetector, GetFaces)
 {
     while (face.InFaceArrayRange())
     {
-        temp_vector = face.GetFaces();
+//        temp_vector = face.GetFaces();
     }
     cerr << temp_vector.size() << endl;
 }

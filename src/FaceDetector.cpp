@@ -12,7 +12,7 @@ cFaceDetector::cFaceDetector() :
     _nestedCascadeName("../data/haarcascades/haarcascade_frontalface_alt_tree.xml"),
     _capture(0),
     _scale(1),
-    _size(100)
+    _size(300)
 {
     _colors[1] = CV_RGB(0, 0, 255);
     _colors[2] = CV_RGB(0, 128, 255);
@@ -89,9 +89,9 @@ bool cFaceDetector::InFaceArrayRange()
     return _r != _faces.end();
 }
 
-vector<int> cFaceDetector::GetFaces()
+Mat& cFaceDetector::GetFaces()
 {
-    cvNamedWindow("face", CV_WINDOW_AUTOSIZE);
+//    cvNamedWindow("face", CV_WINDOW_AUTOSIZE);
     vector<Rect> nestedObjects;
     _nestedCascade.detectMultiScale(_smallImg(*_r), nestedObjects,
                                     1.1, 2, 0 | CV_HAAR_SCALE_IMAGE,
@@ -106,27 +106,27 @@ vector<int> cFaceDetector::GetFaces()
         
 //        rectangle(_image, _rect, _colors[2]);
         _ConvertImage();
-        _FillDataArray();
+//        _FillDataArray();
     }
     _r++;
-    waitKey(0);
-    return _data;
+//    waitKey(0);
+    return _retImage;
 }
 
 void cFaceDetector::_ConvertImage()
 {
     Mat image = _image(_rect);
-//    cv::resize(image, image, Size(_size, _size), 1, 1);
-    Mat image_gray;
-    cvtColor( image, image_gray, CV_RGB2GRAY );
-    Mat sobel = image_gray;
-    Sobel(image_gray, sobel, image_gray.depth(), 1, 0, 3, 1, 0, BORDER_DEFAULT);
+    cv::resize(image, _retImage, Size(_size, _size), 1, 1);
+//    Mat image_gray;
+//    cvtColor( image, image_gray, CV_RGB2GRAY );
+//    Mat sobel = image_gray;
+//    Sobel(image_gray, sobel, image_gray.depth(), 1, 0, 3, 1, 0, BORDER_DEFAULT);
 //    Sobel(sobel, sobel, sobel.depth(), 1, 0, 3, 1, 0, BORDER_DEFAULT);
 //    adaptiveThreshold(sobel, _smallImgCopy, 255, CV_ADAPTIVE_THRESH_MEAN_C, CV_THRESH_BINARY, 25, 0);
 //    threshold(sobel, _smallImgCopy, 128, 255, CV_ADAPTIVE_THRESH_MEAN_C);
 //    adaptiveThreshold(sobel, _smallImgCopy, 8)
 //    Canny(_smallImgCopy, _smallImgCopy, 10, 100);
-    imshow("face", sobel);
+//    imshow("face", sobel);
 //    
 //    cv::resize(image, image, Size(_size, _size), 1, 1);
 //    Mat image_gray;
