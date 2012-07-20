@@ -20,13 +20,12 @@ public:
     cFaceDetector();
     bool Init();
     bool FindFace(const char * image);
+    //Parse faces array.
     bool InFaceArrayRange();
     cv::Mat& GetFaces();
     virtual ~cFaceDetector();
     cv::Mat& GetImage();
 private:
-    std::string _cascadeName;
-    std::string _nestedCascadeName;
     CvCapture* _capture;
     cv::Mat _image;
     cv::Mat _gray;
@@ -42,12 +41,14 @@ private:
     int _tmp;
     int _size;
     std::vector<int> _data;
+    vector<cv::Rect> _nestedObjects;
 
 
     void _DetectFace();
     void _DrawFace();
     void _ConvertImage();
     void _FillDataArray();
+    std::string _haar_cascade_name[4];
     cv::Scalar _colors[8];
 };
 

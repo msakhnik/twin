@@ -8,12 +8,14 @@ using namespace std;
 using namespace cv;
 
 cFaceDetector::cFaceDetector() :
-    _cascadeName("../data/haarcascades/haarcascade_frontalface_alt.xml"),
-    _nestedCascadeName("../data/haarcascades/haarcascade_frontalface_alt_tree.xml"),
     _capture(0),
     _scale(1),
-    _size(300)
+    _size(200)
 {
+    _haar_cascade_name[0] = "../data/haarcascades/haarcascade_frontalface_alt_tree.xml";
+    _haar_cascade_name[1] = "../data/haarcascades/haarcascade_frontalface_default.xml";
+    _haar_cascade_name[2] = "../data/haarcascades/haarcascade_frontalface_alt.xml";
+    _haar_cascade_name[3] = "../data/haarcascades/haarcascade_frontalface_alt2.xml";
     _colors[1] = CV_RGB(0, 0, 255);
     _colors[2] = CV_RGB(0, 128, 255);
     _colors[3] = CV_RGB(0, 255, 255);
@@ -27,7 +29,7 @@ cFaceDetector::cFaceDetector() :
 
 bool cFaceDetector::Init()
 {
-    if (!_cascade.load(_cascadeName) || !_nestedCascade.load(_nestedCascadeName))
+    if (!_cascade.load(_haar_cascade_name[0]) || !_nestedCascade.load(_haar_cascade_name[0]))
     {
         cerr << "ERROR: Could not load classifier cascade" << endl;
         cerr << "Check you cascade files in a data directory\n" << endl;
@@ -51,8 +53,8 @@ bool cFaceDetector::FindFace(const char * image)
     _DetectFace();
     //    _DrawFace();
     _r = _faces.begin();
-//    cvNamedWindow("result", 1);
-//    imshow("result", _image);
+    cvNamedWindow("result", 1);
+    imshow("result", _image);
     waitKey(0);
 
     return true;
@@ -86,17 +88,37 @@ void cFaceDetector::_DetectFace()
 
 bool cFaceDetector::InFaceArrayRange()
 {
-    return _r != _faces.end();
+    if (_r == _faces.end())
+        return false;
+    int i  = 1;
+    while (true)
+    {
+        _nestedCascade.detectMultiScale(_smallImg(*_r), _nestedObjects,
+                                        1.1, 2, 0 | CV_HAAR_SCALE_IMAGE,
+                                        Size(_size, _size));
+        if (_nestedObjects.size() == 0)
+            if (i <= 3)
+                if (!_nestedCascade.load(_haar_cascade_name[i]))
+                {
+                    cerr << "ERROR: Could not load classifier cascade" << endl;
+                    cerr << "Check you cascade files in a data directory\n" << endl;
+                    return false;
+                }
+                else
+                    continue;
+            else
+                return false;
+        else
+            return true;
+    }
 }
 
 Mat& cFaceDetector::GetFaces()
 {
 //    cvNamedWindow("face", CV_WINDOW_AUTOSIZE);
-    vector<Rect> nestedObjects;
-    _nestedCascade.detectMultiScale(_smallImg(*_r), nestedObjects,
-                                    1.1, 2, 0 | CV_HAAR_SCALE_IMAGE,
-                                    Size(_size, _size));
-    for (vector<Rect>::const_iterator nr = nestedObjects.begin(); nr != nestedObjects.end(); nr++)
+    
+    
+    for (vector<Rect>::const_iterator nr = _nestedObjects.begin(); nr != _nestedObjects.end(); nr++)
     {
         _rect.x = cvRound((_r->x + nr->x) * _scale);
         _rect.y = cvRound((_r->y + nr->y) * _scale);
@@ -107,9 +129,13 @@ Mat& cFaceDetector::GetFaces()
 //        rectangle(_image, _rect, _colors[2]);
         _ConvertImage();
 //        _FillDataArray();
+        cerr << "1" << endl;
     }
+    cerr << "2" << endl;
     _r++;
 //    waitKey(0);
+    _nestedObjects.empty();
+    cerr << "3" << endl;
     return _retImage;
 }
 
