@@ -17,5 +17,5 @@ Makefile
 config.log
 config.status
 src/Makefile
-data/
+data/*
 !haarcascades/
