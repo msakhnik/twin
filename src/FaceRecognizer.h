@@ -14,15 +14,15 @@ public:
     void Clear(); 
     bool Init(){ return true; };
     void Train();
-    int GetAnswer(std::string filename);
+    double GetAnswer(cv::  Mat& image);
     void SetThreshold(double number) { _threshold = number; };
     double GetThreshold() { return _threshold; };
     bool ValidateImageArray(unsigned int image_number) { return (image_number >=0 && image_number < _images.size()); };
     cv::Mat GetImage(int image_number) { return _images.at(image_number); };
     unsigned int GetImageSize() { return _images.size(); };
 private:
-    std::vector<cv::Mat> _images;
-    std::vector<int> _labels;
     cv::Ptr<cv::FaceRecognizer> _model;
     double _threshold;
+    std::vector<int> _labels;
+    std::vector<cv::Mat> _images;
 };

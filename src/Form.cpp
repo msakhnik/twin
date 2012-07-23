@@ -5,6 +5,7 @@
 #include <gdkmm-2.4/gdkmm/pixbuf.h>
 
 using namespace std;
+using Glib::ustring;
 
 cForm::cForm(cFaceDetector & face) :
 m_button_file("Load Image"),
@@ -15,7 +16,9 @@ m_frame_vertical_center("Original Image"),
 m_frame_vertical_left("Controls"),
 m_frame_vertical_right("Image in train"),
 _filename(""),
-_face(face)
+_face(face),
+_min_value(0.0),
+    _min_filename("")
 {
     set_title("Face detector");
 
@@ -33,13 +36,13 @@ _face(face)
                                                          &cForm::on_button_file_clicked));
 
     m_button_add_to_train.signal_clicked().connect(sigc::mem_fun(*this,
-                                                         &cForm::on_button_add_to_train_clicked));
+                                                                 &cForm::on_button_add_to_train_clicked));
 
     m_button_train.signal_clicked().connect(sigc::mem_fun(*this,
-                                                         &cForm::on_button_train_clicked));
+                                                          &cForm::on_button_train_clicked));
 
-    //    m_button_folder.signal_clicked().connect(sigc::mem_fun(*this,
-    //                                                           &cForm::on_button_folder_clicked));
+    m_button_folder.signal_clicked().connect(sigc::mem_fun(*this,
+                                                           &cForm::on_button_folder_clicked));
     //    m_button_find_face.signal_clicked().connect(sigc::mem_fun(*this,
     //                                                              &cForm::on_button_find_face_clicked));
     //    m_button_getanswer.signal_clicked().connect(sigc::mem_fun(*this,
@@ -54,18 +57,23 @@ cForm::~cForm()
 
 void cForm::on_button_add_to_train_clicked()
 {
-    static int i = 0;
-    string line;
-    line = "Hello";
-    _AddRow(line, i);
-    ++i;
+    if (!_filename.empty())
+    {
+        _face.FindFace(_filename.c_str());
+        while (_face.InFaceArrayRange())
+        {
+            _recognizer.AddTrainImage(_face.GetFaces(), 0);
+        }
+        _AddRow();
+    }
+    _filename.clear();
 }
 
 void cForm::on_button_train_clicked()
 {
-    try {
-        //Some actions
-        //
+    try
+    {
+        _recognizer.Train();
         Gtk::MessageDialog dialog(*this, "Train Saccesfully",
                                   false /* use_markup */, Gtk::MESSAGE_INFO,
                                   Gtk::BUTTONS_OK);
@@ -73,7 +81,7 @@ void cForm::on_button_train_clicked()
     }
     catch (cv::Exception& e)
     {
-        cout << endl << e.what() <<endl;
+        cout << endl << e.what() << endl;
         Gtk::MessageDialog dialog(*this, "Train Failed",
                                   false /* use_markup */, Gtk::MESSAGE_ERROR,
                                   Gtk::BUTTONS_OK);
@@ -88,6 +96,7 @@ void cForm::on_button_folder_clicked()
     Gtk::FileChooserDialog dialog("Please choose a folder",
                                   Gtk::FILE_CHOOSER_ACTION_SELECT_FOLDER);
     dialog.set_transient_for(*this);
+    dialog.set_current_folder("../data");
 
     //Add response buttons the the dialog:
     dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
@@ -103,6 +112,17 @@ void cForm::on_button_folder_clicked()
         std::cout << "Select clicked." << std::endl;
         std::cout << "Folder selected: " << dialog.get_filename()
                 << std::endl;
+        string filename = dialog.get_filename();
+        _ResultProcess(filename);
+        _filename = _min_filename;
+        cerr << _min_filename << endl;
+        _ShowOriginalImg();
+         Gtk::MessageDialog message(*this, "Thresold:",
+                                  false /* use_markup */, Gtk::MESSAGE_INFO,
+                                  Gtk::BUTTONS_OK);
+         Glib::ustring text = ustring::format(std::fixed, std::setprecision(2), _min_value);
+         message.set_secondary_text(text) ;
+       message.run();
         break;
     }
     case(Gtk::RESPONSE_CANCEL):
@@ -194,7 +214,7 @@ void cForm::_BuildRightBox()
     m_right_box.pack_start(m_hbox_wrap_right, Gtk::PACK_SHRINK, 10);
     m_hbox_wrap_right.pack_start(m_frame_vertical_right, Gtk::PACK_SHRINK, 10);
 
-    m_frame_vertical_right.set_size_request(150, 120);
+    m_frame_vertical_right.set_size_request(150, 220);
     m_frame_vertical_right.add(m_VPaned);
     m_VPaned.add(m_ScrolledWindow);
 
@@ -217,13 +237,40 @@ void cForm::_ShowOriginalImg()
     m_image.show();
 }
 
-void cForm::_AddRow(string& str, int num)
+void cForm::_AddRow()
 {
+    static int i = 0;
     string number;
     std::stringstream ss;
-    ss << num;
+    ss << i;
     ss >> number;
     m_row = *(m_refListStore->append());
     m_row[m_Columns.m_col_num] = number;
-    m_row[m_Columns.m_col_text] = str;
+    m_row[m_Columns.m_col_text] = _filename;
+    ++i;
+}
+
+void cForm::_ResultProcess(string & filename)
+{
+    boost::filesystem::path dir(filename.c_str());
+    bool first_input = true;
+    for (boost::filesystem::directory_iterator it(dir), end; it != end; ++it)
+    {
+        if (it->path().extension() == ".jpg")
+        {
+            cerr << "File in process - " << *it << endl;
+            _face.FindFace(it->path().string().c_str());
+            while (_face.InFaceArrayRange())
+            {
+                double op = _recognizer.GetAnswer(_face.GetFaces());
+                if (first_input || _min_value > op)
+                {
+                    _min_value = op;
+                    _min_filename = it->path().string().c_str();
+                    first_input = false;
+                }
+                
+            }
+        }
+    }
 }

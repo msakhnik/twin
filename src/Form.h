@@ -1,7 +1,8 @@
 #include <gtkmm-2.4/gtkmm.h>
 #include <string.h>
-#include <FaceDetector.h>
+#include "FaceDetector.h"
 #include "FaceRecognizer.h"
+#include <boost/filesystem.hpp>
 
 class cFaceDetector;
 class cFaceRecognizer;
@@ -59,11 +60,14 @@ private:
     std::string _filename;
     cFaceDetector & _face;
     cFaceRecognizer _recognizer;
+    double _min_value;
+    std::string _min_filename; 
 
     void _BuildLeftBox();
     void _BuildCenterBox();
     void _BuildRightBox();
     void _ShowOriginalImg();
-    void _AddRow(std::string& str, int number);
+    void _AddRow();
     void _RemoveRow();
+    void _ResultProcess(std::string &);
 };

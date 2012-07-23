@@ -8,7 +8,7 @@ using namespace std;
 using namespace cv;
 
 cFaceRecognizer::cFaceRecognizer() :
-    _threshold(19000.0)
+_threshold(19000.0)
 {
     cerr << "In cFaceRecognizer" << endl;
 }
@@ -16,6 +16,7 @@ cFaceRecognizer::cFaceRecognizer() :
 cFaceRecognizer::~cFaceRecognizer()
 {
 }
+
 bool cFaceRecognizer::RemoveLastTrainImage()
 {
     if (_images.size() == 0)
@@ -32,14 +33,13 @@ bool cFaceRecognizer::RemoveLastTrainImage()
 
 bool cFaceRecognizer::AddTrainImage(Mat& img, int label)
 {
-    cerr << "Add image < " << endl;
-    _images.push_back(img);
-    if (_images.at(_images.size() - 1).empty())
+    cerr << "Add image " << endl;
+    if (img.empty())
     {
         cerr << "Image not found" << endl;
-        _images.pop_back();
         return false;
     }
+    _images.push_back(img);
     _labels.push_back(label);
 
     return true;
@@ -53,28 +53,29 @@ void cFaceRecognizer::Clear()
 
 void cFaceRecognizer::Train()
 {
-    _model = createEigenFaceRecognizer(_images.size(), _threshold);
-//    _model = createEigenFaceRecognizer();
+//    _model = createEigenFaceRecognizer(_images.size(), _threshold);
+        _model = createEigenFaceRecognizer();
     _model->train(_images, _labels);
 }
 
-int cFaceRecognizer::GetAnswer(std::string filename)
+double cFaceRecognizer::GetAnswer(Mat& testImage)
 {
-    Mat testImage = imread(filename.c_str(), 0);
+//    Mat testImage = imread(filename.c_str(), 0);
 
     if (testImage.empty())
     {
         cerr << "Image is empty" << endl;
         return -1;
     }
-    
-//    int predictedLabel = 1;
-//    double confidence = 0.0;
-//    
-//    predictedLabel = 0;
-//    confidence = 0.0;
-//    _model->predict(testImage, predictedLabel, confidence);
-//    cerr << confidence << endl;
+//    cerr << testImage.cols << endl;
 
-    return _model->predict(testImage);
+        int predictedLabel = 1;
+        double confidence = 0.0;
+        
+        predictedLabel = 0;
+        confidence = 0.0;
+        _model->predict(testImage, predictedLabel, confidence);
+    //    cerr << confidence << endl;
+
+    return confidence;
 }

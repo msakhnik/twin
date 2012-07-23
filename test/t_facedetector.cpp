@@ -14,7 +14,7 @@ TEST(cFaceDetector, Init)
 
 TEST(cFaceDetector, FindFace)
 {
-    ASSERT_TRUE(face.FindFace("../data/misha/12.jpg"));
+    ASSERT_TRUE(face.FindFace("../data/misha/2.jpg"));
 }
 
 TEST(cFaceDetector, GetFace)

@@ -1,35 +1,73 @@
 #include <gtest/gtest.h>
 #include "../src/FaceRecognizer.h"
+#include "../src/FaceDetector.h"
 #include <iostream>
 #include <numeric>
 
 using namespace std;
 
 cFaceRecognizer recognizer;
+cFaceDetector face;
 
 TEST(cFaceRecognizer, Init)
 {
     ASSERT_TRUE(recognizer.Init());
+    ASSERT_TRUE(face.Init());
+    
 }
 
 TEST(cFaceRecognizer, AddImage)
 {
-    ASSERT_TRUE(recognizer.AddTrainImage("../data/misha/1.jpg", 0));
-    ASSERT_TRUE(recognizer.AddTrainImage("../data/misha/2.jpg", 0));
-    ASSERT_TRUE(recognizer.AddTrainImage("../data/misha/3.jpg", 0));
-    ASSERT_TRUE(recognizer.AddTrainImage("../data/misha/4.jpg", 0));
-    ASSERT_TRUE(recognizer.AddTrainImage("../data/misha/5.jpg", 0));
-    ASSERT_TRUE(recognizer.AddTrainImage("../data/misha/6.jpg", 0));
-    ASSERT_TRUE(recognizer.AddTrainImage("../data/misha/7.jpg", 0));
-    ASSERT_TRUE(recognizer.AddTrainImage("../data/misha/8.jpg", 0));
-    ASSERT_TRUE(recognizer.AddTrainImage("../data/misha/9.jpg", 0));
-    ASSERT_TRUE(recognizer.AddTrainImage("../data/misha/12.jpg", 0));
-    ASSERT_FALSE(recognizer.AddTrainImage("../data/misha/-1.jpg", 0));
-}
-
-TEST(cFaceRecognizer, PopImage)
-{
-    ASSERT_TRUE(recognizer.RemoveLastTrainImage());
+    face.FindFace("../data/misha/1.jpg");
+    while(face.InFaceArrayRange())
+    {
+        cv::Mat img;
+        img = face.GetFaces();
+        recognizer.AddTrainImage(img, 0);
+//        cvNamedWindow("face", CV_WINDOW_AUTOSIZE);
+//        imshow("face", img);
+//        cv::waitKey();
+    }
+    face.FindFace("../data/misha/2.jpg");
+    while(face.InFaceArrayRange())
+    {
+        cv::Mat img;
+        img = face.GetFaces();
+        recognizer.AddTrainImage(img, 0);
+//        cvNamedWindow("face", CV_WINDOW_AUTOSIZE);
+//        imshow("face", img);
+//        cv::waitKey();
+    }
+    face.FindFace("../data/misha/3.jpg");
+    while(face.InFaceArrayRange())
+    {
+        cv::Mat img;
+        img = face.GetFaces();
+        recognizer.AddTrainImage(img, 0);
+//        cvNamedWindow("face", CV_WINDOW_AUTOSIZE);
+//        imshow("face", img);
+//        cv::waitKey();
+    }
+    face.FindFace("../data/misha/4.jpg");
+    while(face.InFaceArrayRange())
+    {
+        cv::Mat img;
+        img = face.GetFaces();
+        recognizer.AddTrainImage(img, 0);
+//        cvNamedWindow("face", CV_WINDOW_AUTOSIZE);
+//        imshow("face", img);
+//        cv::waitKey();
+    }
+    face.FindFace("../data/misha/5.jpg");
+    while(face.InFaceArrayRange())
+    {
+        cv::Mat img;
+        img = face.GetFaces();
+        recognizer.AddTrainImage(img, 0);
+//        cvNamedWindow("face", CV_WINDOW_AUTOSIZE);
+//        imshow("face", img);
+//        cv::waitKey();
+    }
 }
 
 TEST(cFaceRecognizer, Train)
@@ -39,9 +77,15 @@ TEST(cFaceRecognizer, Train)
 
 TEST(cFaceRecognizer, GetAnswer)
 {
-    ASSERT_EQ(0, recognizer.GetAnswer("../data/misha/1.jpg"));
-    ASSERT_EQ(0, recognizer.GetAnswer("../data/misha/2.jpg"));
-    ASSERT_EQ(0, recognizer.GetAnswer("../data/misha/7.jpg"));
-    ASSERT_EQ(0, recognizer.GetAnswer("../data/misha/11.jpg"));
-    ASSERT_EQ(-1, recognizer.GetAnswer("../data/meg1/2.jpg"));
+    face.FindFace("../data/test_img/dfgswef.jpg");
+    while(face.InFaceArrayRange())
+    {
+        cv::Mat img;
+        img = face.GetFaces();
+        cvNamedWindow("face", CV_WINDOW_AUTOSIZE);
+        imshow("face", img);
+        cv::waitKey();
+        int op = recognizer.GetAnswer(img);
+        cerr << op << endl;
+    }
 }
