@@ -9,12 +9,7 @@ using namespace std;
 cFaceRecognizer recognizer;
 cFaceDetector face;
 
-TEST(cFaceRecognizer, Init)
-{
-    ASSERT_TRUE(recognizer.Init());
-    ASSERT_TRUE(face.Init());
-    
-}
+
 
 TEST(cFaceRecognizer, AddImage)
 {

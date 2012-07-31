@@ -7,11 +7,6 @@ using namespace std;
 
 cFaceDetector face;
 
-TEST(cFaceDetector, Init)
-{
-    ASSERT_TRUE(face.Init());
-}
-
 TEST(cFaceDetector, FindFace)
 {
     ASSERT_TRUE(face.FindFace("../data/misha/2.jpg"));
