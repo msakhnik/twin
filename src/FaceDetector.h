@@ -20,13 +20,11 @@ public:
     cFaceDetector();
     bool Init();
     bool FindFace(const char * image);
-    //Parse faces array.
     bool InFaceArrayRange();
     cv::Mat& GetFaces();
     virtual ~cFaceDetector();
-    cv::Mat& GetImage();
+    cv::Mat& GetImage(){ return _image; };
 private:
-    CvCapture* _capture;
     cv::Mat _image;
     cv::Mat _gray;
     cv::Mat _smallImg;
@@ -47,8 +45,6 @@ private:
     void _DetectFace();
     void _DrawFace();
     void _ConvertImage();
-    void _FillDataArray();
     std::string _haar_cascade_name[4];
     cv::Scalar _colors[8];
 };
-

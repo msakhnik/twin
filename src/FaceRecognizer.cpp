@@ -10,7 +10,6 @@ using namespace cv;
 cFaceRecognizer::cFaceRecognizer() :
 _threshold(19000.0)
 {
-    cerr << "In cFaceRecognizer" << endl;
 }
 
 cFaceRecognizer::~cFaceRecognizer()
@@ -53,29 +52,24 @@ void cFaceRecognizer::Clear()
 
 void cFaceRecognizer::Train()
 {
-//    _model = createEigenFaceRecognizer(_images.size(), _threshold);
-        _model = createEigenFaceRecognizer();
+    _model = createEigenFaceRecognizer();
     _model->train(_images, _labels);
 }
 
 double cFaceRecognizer::GetAnswer(Mat& testImage)
 {
-//    Mat testImage = imread(filename.c_str(), 0);
-
     if (testImage.empty())
     {
         cerr << "Image is empty" << endl;
         return -1;
     }
-//    cerr << testImage.cols << endl;
 
-        int predictedLabel = 1;
-        double confidence = 0.0;
-        
-        predictedLabel = 0;
-        confidence = 0.0;
-        _model->predict(testImage, predictedLabel, confidence);
-    //    cerr << confidence << endl;
+    int predictedLabel = 1;
+    double confidence = 0.0;
+
+    predictedLabel = 0;
+    confidence = 0.0;
+    _model->predict(testImage, predictedLabel, confidence);
 
     return confidence;
 }

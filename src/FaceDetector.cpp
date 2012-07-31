@@ -8,7 +8,6 @@ using namespace std;
 using namespace cv;
 
 cFaceDetector::cFaceDetector() :
-_capture(0),
 _scale(1),
 _size(200)
 {
@@ -29,7 +28,8 @@ _size(200)
 
 bool cFaceDetector::Init()
 {
-    if (!_cascade.load(_haar_cascade_name[0]) || !_nestedCascade.load(_haar_cascade_name[0]))
+    if (!_cascade.load(_haar_cascade_name[0]) ||
+            !_nestedCascade.load(_haar_cascade_name[0]))
     {
         cerr << "ERROR: Could not load classifier cascade" << endl;
         cerr << "Check you cascade files in a data directory\n" << endl;
@@ -49,11 +49,7 @@ bool cFaceDetector::FindFace(const char * image)
     }
 
     _DetectFace();
-    //    _DrawFace();
     _r = _faces.begin();
-    //    cvNamedWindow("result", 1);
-    //    imshow("result", _image);
-    //    waitKey(0);
 
     return true;
 }
@@ -65,7 +61,8 @@ cFaceDetector::~cFaceDetector()
 void cFaceDetector::_DetectFace()
 {
     double t = 0;
-    Mat smallImg(cvRound(_image.rows / _scale), cvRound(_image.cols / _scale), CV_8UC1);
+    Mat smallImg(cvRound(_image.rows / _scale), cvRound(_image.cols / _scale),
+                 CV_8UC1);
     _smallImg = smallImg;
 
     cvtColor(_image, _gray, CV_BGR2GRAY);
@@ -75,13 +72,11 @@ void cFaceDetector::_DetectFace()
     t = (double) cvGetTickCount();
     _cascade.detectMultiScale(_smallImg, _faces,
                               1.1, 2, 0
-                              //|CV_HAAR_FIND_BIGGEST_OBJECT
-                              //|CV_HAAR_DO_ROUGH_SEARCH
-                              | CV_HAAR_SCALE_IMAGE
-                              ,
+                              | CV_HAAR_SCALE_IMAGE,
                               Size(_size, _size));
     t = (double) cvGetTickCount() - t;
-    cerr << "detection time = " << (t / ((double) cvGetTickFrequency()*1000.)) << " ms" << endl;
+    cerr << "detection time = " << (t / ((double) cvGetTickFrequency()*1000.))
+            << " ms" << endl;
 }
 
 bool cFaceDetector::InFaceArrayRange()
@@ -102,16 +97,14 @@ bool cFaceDetector::InFaceArrayRange()
                                         Size(_size, _size));
 
         ++i;
-        cerr << "i = " << i << endl;
-    } while (_nestedObjects.size() == 0 && i <= 3);
+    }
+    while (_nestedObjects.size() == 0 && i <= 3);
+
     return true;
 }
 
 Mat& cFaceDetector::GetFaces()
 {
-    //    cvNamedWindow("face", CV_WINDOW_AUTOSIZE);
-
-
     for (vector<Rect>::const_iterator nr = _nestedObjects.begin(); nr != _nestedObjects.end(); nr++)
     {
         _rect.x = cvRound((_r->x + nr->x) * _scale);
@@ -120,12 +113,9 @@ Mat& cFaceDetector::GetFaces()
         _rect.height = cvRound((nr->width + nr->height)*0.5 * _scale);
         cerr << _rect.width << ";" << _rect.height << endl;
 
-        //        rectangle(_image, _rect, _colors[2]);
         _ConvertImage();
-        //        _FillDataArray();
     }
     _r++;
-    //    waitKey(0);
     _nestedObjects.empty();
 
     return _retImage;
@@ -136,19 +126,6 @@ void cFaceDetector::_ConvertImage()
     Mat image = _image(_rect);
     cv::resize(image, _retImage, Size(_size, _size), 1, 1);
     cv::cvtColor(_retImage, _retImage, CV_BGR2GRAY);
-}
-
-void cFaceDetector::_FillDataArray()
-{
-    _data.empty();
-    for (int i = 0; i < _smallImgCopy.rows; ++i)
-    {
-        for (int j = 0; j < _smallImgCopy.cols; ++j)
-            if (_smallImgCopy.at<bool>(i, j))
-                _data.push_back(1);
-            else
-                _data.push_back(0);
-    }
 }
 
 void cFaceDetector::_DrawFace()
@@ -170,24 +147,14 @@ void cFaceDetector::_DrawFace()
         smallImgROI = _smallImg(*r);
         _nestedCascade.detectMultiScale(smallImgROI, nestedObjects,
                                         1.1, 2, 0
-                                        //|CV_HAAR_FIND_BIGGEST_OBJECT
-                                        //|CV_HAAR_DO_ROUGH_SEARCH
-                                        //|CV_HAAR_DO_CANNY_PRUNING
-                                        //                                        | CV_HAAR_SCALE_IMAGE
-                                        | CV_HAAR_DO_CANNY_PRUNING
-                                        ,
+                                        | CV_HAAR_DO_CANNY_PRUNING,
                                         Size(30, 30));
         for (vector<Rect>::const_iterator nr = nestedObjects.begin(); nr != nestedObjects.end(); nr++)
         {
             center.x = cvRound((r->x + nr->x + nr->width * 0.5) * _scale);
             center.y = cvRound((r->y + nr->y + nr->height * 0.5) * _scale);
             radius = cvRound((nr->width + nr->height)*0.25 * _scale);
-            //            circle( _image, center, radius, color, 3, 8, 0 );
+            //                        circle( _image, center, radius, color, 3, 8, 0 );
         }
     }
-}
-
-cv::Mat& cFaceDetector::GetImage()
-{
-    return _image;
 }

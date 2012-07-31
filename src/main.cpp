@@ -6,7 +6,6 @@
  */
 
 #include <cstdlib>
-#include "AnnTrain.h"
 #include "Form.h"
 #include "FaceDetector.h"
 
@@ -38,4 +37,3 @@ int main(int argc, char** argv)
     }
     return 0;
 }
-

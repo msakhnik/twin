@@ -31,10 +31,7 @@ protected:
     Gtk::Frame m_frame_vertical_left;
 
     Gtk::Image m_image, m_list;
-    Gtk::VPaned m_VPaned;
-    Gtk::Label m_wait;
-    Gtk::Window m_modal;
-    
+
 
 private:
     cFaceDetector & _face;

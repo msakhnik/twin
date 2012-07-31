@@ -10,16 +10,15 @@ using Glib::ustring;
 cForm::cForm(cFaceDetector & face) :
 m_button_add_to_train("Train Files"),
 m_button_folder("Force Folder"),
-m_frame_vertical_center("Original Image"),
+m_frame_vertical_center("Image"),
 m_frame_vertical_left("Controls"),
-        m_wait("Please wait..."),
 _face(face),
 _min_value(0.0),
 _min_filename(""),
-        _directory_name("")
+_directory_name("")
 {
     set_title("Twin");
-    
+
 
     add(m_main_box);
     m_main_box.set_size_request(550, 350);
@@ -30,14 +29,14 @@ _min_filename(""),
     _BuildCenterBox();
 
     m_button_add_to_train.signal_clicked().connect(sigc::mem_fun(*this,
-                                                                 &cForm::on_button_choose_dialog_cliked));
+        &cForm::on_button_choose_dialog_cliked));
     m_button_add_to_train.signal_released().connect(sigc::mem_fun(*this,
-                                                                 &cForm::on_train));
+        &cForm::on_train));
 
     m_button_folder.signal_clicked().connect(sigc::mem_fun(*this,
-                                                           &cForm::on_button_choose_dialog_cliked));
+        &cForm::on_button_choose_dialog_cliked));
     m_button_folder.signal_released().connect(sigc::mem_fun(*this,
-                                                                 &cForm::on_get_answer));
+        &cForm::on_get_answer));
 
     show_all_children();
 }
@@ -53,7 +52,6 @@ void cForm::on_button_choose_dialog_cliked()
     dialog.set_transient_for(*this);
     dialog.set_current_folder("../data");
 
-    //Add response buttons the the dialog:
     dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
     dialog.add_button("Select", Gtk::RESPONSE_OK);
     int result = dialog.run();
@@ -77,7 +75,7 @@ void cForm::on_button_choose_dialog_cliked()
         break;
     }
     }
-    dialog.hide_all();
+    //    dialog.hide_all();
 }
 
 void cForm::_Train()
@@ -86,7 +84,7 @@ void cForm::_Train()
     {
         _recognizer.Train();
         Gtk::MessageDialog dialog(*this, "Train Saccesfully",
-                                  false /* use_markup */, Gtk::MESSAGE_INFO,
+                                  false, Gtk::MESSAGE_INFO,
                                   Gtk::BUTTONS_OK);
         dialog.run();
     }
@@ -94,7 +92,7 @@ void cForm::_Train()
     {
         cout << endl << e.what() << endl;
         Gtk::MessageDialog dialog(*this, "Train Failed",
-                                  false /* use_markup */, Gtk::MESSAGE_ERROR,
+                                  false, Gtk::MESSAGE_ERROR,
                                   Gtk::BUTTONS_OK);
         dialog.set_secondary_text(
                                   e.what());
@@ -108,7 +106,6 @@ void cForm::on_train()
     {
         _AddTrainFiles(_directory_name);
         _Train();
-        m_modal.hide();
         _directory_name.clear();
     }
 }
@@ -120,10 +117,11 @@ void cForm::on_get_answer()
         _ResultProcess(_directory_name);
         cerr << _min_filename << endl;
         _ShowOriginalImg();
-        Gtk::MessageDialog message(*this, "Thresold:",
-                                   false /* use_markup */, Gtk::MESSAGE_INFO,
+        Gtk::MessageDialog message(*this, "Threshold:",
+                                   false, Gtk::MESSAGE_INFO,
                                    Gtk::BUTTONS_OK);
-        Glib::ustring text = ustring::format(std::fixed, std::setprecision(2), _min_value);
+        Glib::ustring text = ustring::format(std::fixed, std::setprecision(2),
+                                    _min_value);
         message.set_secondary_text(text);
         message.run();
     }
@@ -147,7 +145,8 @@ void cForm::_BuildLeftBox()
 void cForm::_BuildCenterBox()
 {
     m_center_box.pack_start(m_hbox_wrap_center, Gtk::PACK_SHRINK, 10);
-    m_hbox_wrap_center.pack_start(m_frame_vertical_center, Gtk::PACK_SHRINK, 10);
+    m_hbox_wrap_center.pack_start(m_frame_vertical_center,
+                                    Gtk::PACK_SHRINK, 10);
 
     m_frame_vertical_center.set_size_request(300, 300);
     m_frame_vertical_center.add(m_image);
@@ -167,7 +166,7 @@ void cForm::_ResultProcess(string & filename)
     bool first_input = true;
     for (boost::filesystem::directory_iterator it(dir), end; it != end; ++it)
     {
-        if (it->path().extension() == ".jpg")
+        if (it->path().extension() == ".jpg" || it->path().extension() == ".JPG")
         {
             cerr << "File in process - " << *it << endl;
             _face.FindFace(it->path().string().c_str());
@@ -190,7 +189,8 @@ void cForm::_AddTrainFiles(string& filename)
     boost::filesystem::path dir(filename.c_str());
     try
     {
-        for (boost::filesystem::directory_iterator it(dir), end; it != end; ++it)
+        for (boost::filesystem::directory_iterator it(dir), end;
+                                    it != end; ++it)
         {
             if (it->path().extension() == ".jpg")
             {
@@ -207,7 +207,7 @@ void cForm::_AddTrainFiles(string& filename)
     {
         cout << endl << e.what() << endl;
         Gtk::MessageDialog dialog(*this, "Train Failed",
-                                  false /* use_markup */, Gtk::MESSAGE_ERROR,
+                                  false, Gtk::MESSAGE_ERROR,
                                   Gtk::BUTTONS_OK);
         dialog.set_secondary_text(
                                   e.what());
