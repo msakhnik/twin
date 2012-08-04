@@ -3,6 +3,7 @@
 #include "FaceDetector.h"
 #include "FaceRecognizer.h"
 #include <boost/filesystem.hpp>
+#include <boost/thread.hpp>
 
 class cFaceDetector;
 class cFaceRecognizer;
@@ -32,7 +33,6 @@ protected:
 
     Gtk::Image m_image, m_list;
 
-
 private:
     cFaceDetector & _face;
     cFaceRecognizer _recognizer;
@@ -46,5 +46,4 @@ private:
     void _ResultProcess(std::string &);
     void _AddTrainFiles(std::string &);
     void _Train();
-    void _OpenModalWindow();
 };

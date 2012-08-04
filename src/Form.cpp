@@ -75,7 +75,7 @@ void cForm::on_button_choose_dialog_cliked()
         break;
     }
     }
-    //    dialog.hide_all();
+        dialog.hide_all();
 }
 
 void cForm::_Train()

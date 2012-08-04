@@ -9,8 +9,6 @@ using namespace std;
 cFaceRecognizer recognizer;
 cFaceDetector face;
 
-
-
 TEST(cFaceRecognizer, AddImage)
 {
     face.FindFace("../data/misha/1.jpg");

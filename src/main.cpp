@@ -18,6 +18,7 @@ using namespace std;
  */
 int main(int argc, char** argv)
 {
+    gdk_threads_enter();
     Gtk::Main kit(argc, argv);
     cFaceDetector face;
     cForm form(face);
@@ -35,5 +36,6 @@ int main(int argc, char** argv)
     {
         Gtk::Main::run(form);
     }
+    gdk_threads_leave();
     return 0;
 }
